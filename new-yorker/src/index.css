@@ -2,8 +2,24 @@ main{
     min-height: 80vh;
 }
 
-ml-auto{
-        list-style: none;
-        padding: 0 20px;
-        position: relative;
-    }
+.productRating{
+    font-size: 0.9rem;
+}
+
+.title{
+    font-size: 1.2rem;
+    line-height: 1.4;
+    font-weight: 900;
+    text-decoration: none;
+    text-align: left;
+}
+
+h3{
+    padding: 14px 0 0;
+}
+.rating span{
+    margin: 10px 0;
+}
+.rating{
+    font-size: 1.2rem;
+}
