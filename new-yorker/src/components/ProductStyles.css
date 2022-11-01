@@ -1,0 +1,8 @@
+.btn {
+    background-color: rgb(50, 50, 50);
+    color: #fff;
+}
+
+.row-space {
+    display: flex;
+}
