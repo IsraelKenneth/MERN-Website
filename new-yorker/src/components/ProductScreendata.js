@@ -1,24 +1,32 @@
+import { useSelector, useDispatch } from 'react-redux'
 import React, { useEffect, useState } from 'react'
 import "./ProductStyles.css"
-import { Link, useParams } from 'react-router-dom'
-import { Row, Col, Image, ListGroup, Card, Button, ListGroupItem } from 'react-bootstrap'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Form, Row, Col, Image, ListGroup, Card, Button, ListGroupItem } from 'react-bootstrap'
 import Rating from '../components/Rating'
-import axios from "axios"
+import { listProductDetails } from '../actions/productActions'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
 
 
 const ProductScreendata = () => {
 
-    const [product, setproduct] = useState([]);
+    const navigate = useNavigate()
+    const [qty, setQty] = useState(1)
 
-    const { id } = useParams();
+    const { id } = useParams()
 
+    const dispatch = useDispatch()
+    const productDetails = useSelector(state => state.productDetails)
+
+    const { product, error, loading } = productDetails
     useEffect(() => {
-        async function fetchProduct() {
-            const { data } = await axios.get(`/api/products/${id}`)
-            setproduct(data)
-        }
-        fetchProduct()
-    }, []);
+        dispatch(listProductDetails(id))
+    }, [dispatch, id]);
+
+    const addToCartHandler = () => {
+        navigate(`/cart/${id}?qty=${qty}`);
+    }
 
 
     return (
@@ -27,8 +35,8 @@ const ProductScreendata = () => {
             <Link className='btn btn-light my-3' to='/'>
                 Go Back
             </Link>
-
-            <Row className='row-space'>
+            {loading ? <Loader /> : error ? <Message>{error}</Message> :
+                (<Row className='row-space'>
                 <Col md={6}>
                     <Image className='img' src={product.image} alt={product.name} fluid />
                 </Col>
@@ -62,15 +70,43 @@ const ProductScreendata = () => {
                                 Stock: {product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
                             </h3>
                         </ListGroupItem>
+                            {product.countInStock > 0 && (
+                                <ListGroup.Item>
+                                    <Row>
+                                        <Col>Qty</Col>
+                                        <Col>
+                                            <Form.Control
+                                                as='select'
+                                                value={qty}
+                                                onChange={(e) => setQty(e.target.value)}
+                                            >
+                                                {[...Array(product.countInStock).keys()].map(
+                                                    (x) => (
+                                                        <option key={x + 1} value={x + 1}>
+                                                            {x + 1}
+                                                        </option>
+                                                    )
+                                                )}
+                                            </Form.Control>
+                                        </Col>
+                                    </Row>
+                                </ListGroup.Item>
+                            )}
                         <ListGroupItem>
-                            <button className='btn btn-light my-3'>
+                                <Button onClick={addToCartHandler}
+                                    className='btn-block'
+                                    type='button'
+                                    disabled={product.countInStock === 0}>
+
                                 Add to Cart
-                            </button>
+                                </Button>
                         </ListGroupItem>
                     </ListGroup>
                 </Col>
-            </Row>
-        </div >
+                </Row>
+                )
+            }
+        </div>
     )
 }
 
